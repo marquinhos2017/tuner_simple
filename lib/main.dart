@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _hasPitchDetectingStarted = false;
 
   Color e_afinado = Colors.white;
+  bool iniciado = false;
 
   final _audioRecorder = FlutterAudioCapture();
   final pitchDetectorDart = PitchDetector(44100, 2000);
@@ -109,18 +110,30 @@ class _HomeScreenState extends State<HomeScreen> {
     double rms = calculateRMS(audioSample);
 
     // Set a threshold level for the volume
-    double volumeThreshold = 0.02; // Adjust this value according to your needs
+    double volumeThreshold = 0.005; // Adjust this value according to your needs
 
     if (rms > volumeThreshold) {
       // pitch_detector_dart library allows translating from audio sample to actual pitch
       final result = pitchDetectorDart.getPitch(audioSample);
       //print("Frequency captured: " + result.pitch.toString());
-      print("Amostra $i :" + result.pitch.toString());
+
+      if (result.pitch == -1.0) {
+        print("Impercepitivel");
+        setState(() {});
+      } else {
+        print("Amostra $i :" + result.pitch.toString());
+      }
       if (result.pitch >= 70 && result.pitch <= 350) {
+        setState(() {
+          iniciado = true;
+        });
         // Cordas do Violao afinadas emitem frequencia entre 82 e 330.
         if (result.pitch >= 72 && result.pitch <= 92) {
           // Se houvir uma frequencia entre 72 e 92 eh pq esta perto da Mizona
           print("Ao redor da Mizona");
+          setState(() {
+            note = "E";
+          });
           if (result.pitch >= 82 && result.pitch <= 83) {
             print("E Afinada");
             setState(() {
@@ -172,10 +185,10 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
 
-        if (result.pitch >= 136 && result.pitch <= 156) {
+        if (result.pitch >= 136 && result.pitch <= 186) {
           // Se houvir uma frequencia entre 72 e 92 eh pq esta perto da Mizona
           print("Ao redor da D");
-          if (result.pitch >= 145 && result.pitch <= 146) {
+          if (result.pitch >= 145 && result.pitch <= 147) {
             print("A Afinada");
             setState(() {
               background = afinado_background;
@@ -229,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (result.pitch >= 237 && result.pitch <= 257) {
           // Se houvir uma frequencia entre 72 e 92 eh pq esta perto da Mizona
           print("Ao redor da B");
-          if (result.pitch >= 246 && result.pitch <= 248) {
+          if (result.pitch >= 246.8 && result.pitch <= 247.2) {
             print("G Afinada");
             setState(() {
               background = afinado_background;
@@ -256,8 +269,9 @@ class _HomeScreenState extends State<HomeScreen> {
         if (result.pitch >= 320 && result.pitch <= 340) {
           // Se houvir uma frequencia entre 72 e 92 eh pq esta perto da Mizona
           print("Ao redor da E");
-          if (result.pitch >= 329 && result.pitch <= 331) {
-            print("G Afinada");
+          note = "E";
+          if (result.pitch >= 329.8 && result.pitch <= 330.2) {
+            print("E Afinada");
             setState(() {
               background = afinado_background;
               Cor_Texto = afinado;
@@ -289,10 +303,18 @@ class _HomeScreenState extends State<HomeScreen> {
         // Updating state to show the result of the note
 
         setState(() {
-          note = handledPitchResult.note;
-          status = '';
+          if (handledPitchResult.note == "") {
+          } else {
+            note = handledPitchResult.note;
+          }
+
+          //status = '';
         });
       }
+    } else {
+      setState(() {
+        //note = '';
+      });
     }
   }
 
@@ -304,8 +326,17 @@ class _HomeScreenState extends State<HomeScreen> {
     begin: Alignment.topRight,
     end: Alignment.bottomLeft,
     colors: <Color>[
-      Color.fromARGB(255, 250, 250, 250),
-      Color.fromARGB(255, 167, 167, 167),
+      Color.fromARGB(255, 24, 21, 21),
+      Color.fromARGB(255, 28, 26, 26),
+    ],
+  );
+
+  LinearGradient imperceptivel = LinearGradient(
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+    colors: <Color>[
+      Color.fromARGB(255, 30, 28, 28),
+      Color.fromARGB(255, 27, 26, 26),
     ],
   );
 
@@ -442,7 +473,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         child: ElevatedButton(
                           child: Text(
-                            "Clique aqui para permitir o microfone",
+                            "Afinar",
                             style: TextStyle(
                               color: Colors.black,
                             ),
@@ -453,7 +484,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Visibility(
-                    visible: _hasPitchDetectingStarted,
+                    visible: _hasPitchDetectingStarted && iniciado,
                     child: Container(
                       width: 307,
                       height: 32,
@@ -470,12 +501,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  BoxDecoration getBoxDecoration() {
-    return BoxDecoration(
-      gradient: acima_background,
     );
   }
 }
