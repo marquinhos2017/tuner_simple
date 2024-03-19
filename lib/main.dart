@@ -9,6 +9,7 @@ import 'package:pitchupdart/instrument_type.dart';
 import 'package:pitchupdart/pitch_handler.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool iniciado = false;
 
   final _audioRecorder = FlutterAudioCapture();
-  final pitchDetectorDart = PitchDetector(44100, 2000);
+  final pitchDetectorDart = PitchDetector(44100, 3000);
   final pitchupDart = PitchHandler(InstrumentType.guitar);
 
   var note = '';
@@ -118,10 +119,10 @@ class _HomeScreenState extends State<HomeScreen> {
       //print("Frequency captured: " + result.pitch.toString());
 
       if (result.pitch == -1.0) {
-        print("Impercepitivel");
+        //print("Impercepitivel");
         setState(() {});
       } else {
-        print("Amostra $i :" + result.pitch.toString());
+        //print("Amostra $i :" + result.pitch.toString());
       }
       if (result.pitch >= 70 && result.pitch <= 350) {
         setState(() {
@@ -134,21 +135,21 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             note = "E";
           });
-          if (result.pitch >= 82 && result.pitch <= 83) {
+          if (result.pitch >= 81.8 && result.pitch <= 82.2) {
             print("E Afinada");
             setState(() {
               background = afinado_background;
               Cor_Texto = afinado;
               cor_button = afinado_button;
             });
-          } else if (result.pitch >= 70 && result.pitch < 82) {
+          } else if (result.pitch >= 70 && result.pitch < 81.8) {
             print("Acoche um pouco");
             setState(() {
               background = abaixo_background;
               Cor_Texto = abaixo;
               cor_button = abaixo_button;
             });
-          } else if (result.pitch >= 83 && result.pitch <= 92) {
+          } else if (result.pitch >= 82.2 && result.pitch <= 92) {
             print("Desafroge um pouco");
             setState(() {
               background = acima_background;
@@ -164,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (result.pitch >= 109 && result.pitch <= 111) {
             print("A Afinada");
             setState(() {
+              note = "A";
               background = afinado_background;
               Cor_Texto = afinado;
               cor_button = afinado_button;
@@ -191,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (result.pitch >= 145 && result.pitch <= 147) {
             print("A Afinada");
             setState(() {
+              note = "D";
               background = afinado_background;
               Cor_Texto = afinado;
               cor_button = afinado_button;
@@ -218,6 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (result.pitch >= 195 && result.pitch <= 197) {
             print("G Afinada");
             setState(() {
+              note = "G";
               background = afinado_background;
               Cor_Texto = afinado;
               cor_button = afinado_button;
@@ -241,10 +245,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (result.pitch >= 237 && result.pitch <= 257) {
           // Se houvir uma frequencia entre 72 e 92 eh pq esta perto da Mizona
-          print("Ao redor da B");
+          print("Ao redor da B: " + result.pitch.toString());
           if (result.pitch >= 246.8 && result.pitch <= 247.2) {
             print("G Afinada");
             setState(() {
+              note = "B";
               background = afinado_background;
               Cor_Texto = afinado;
               cor_button = afinado_button;
@@ -267,6 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         if (result.pitch >= 320 && result.pitch <= 340) {
+          print(result.pitch.toString());
           // Se houvir uma frequencia entre 72 e 92 eh pq esta perto da Mizona
           print("Ao redor da E");
           note = "E";
@@ -277,14 +283,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Cor_Texto = afinado;
               cor_button = afinado_button;
             });
-          } else if (result.pitch > 320 && result.pitch < 329) {
+          } else if (result.pitch > 320 && result.pitch < 329.8) {
             print("Acoche um pouco");
             setState(() {
               background = abaixo_background;
               Cor_Texto = abaixo;
               cor_button = abaixo_button;
             });
-          } else if (result.pitch > 331 && result.pitch < 340) {
+          } else if (result.pitch > 330.2 && result.pitch < 340) {
             print("Desafroge um pouco");
             setState(() {
               background = acima_background;
@@ -454,6 +460,19 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Column(
                 children: [
+                  Visibility(
+                    visible: _hasPitchDetectingStarted,
+                    child: Container(
+                      child: Text(
+                        "Iniciado",
+                        style: TextStyle(
+                          foreground: Paint()..shader = Cor_Texto,
+                          fontSize: 12,
+                        ),
+                        // This was added to show notes in the middle.
+                      ),
+                    ),
+                  ),
                   Visibility(
                     visible: _hasPitchDetectingStarted,
                     child: Container(
